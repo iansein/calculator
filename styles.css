@@ -14,7 +14,7 @@ html {
 
 body {
   background-color: #536ca2;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -22,7 +22,15 @@ body {
   overflow: hidden;
 }
 
-.main-container {
+.container {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  margin-top: 150px;
+}
+
+.main-calculator-container {
+  align-self: flex-end;
   padding: 20px;
   padding-top: 38px;
   border: 1px solid black;
@@ -51,6 +59,14 @@ body {
   width: 70px;
   aspect-ratio: 1/1;
   border-radius: 10px;
+}
+
+.calculator-items:hover {
+  background-color: #a9908c;
+}
+
+.calculator-items:active {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .display-container {
@@ -115,7 +131,27 @@ body {
   aspect-ratio: 1/1;
 }
 
+.clear-all-button:hover,
+.clear-button:hover {
+  background-color: #ba4232 !important;
+}
+
+.equals-button:hover {
+  background-color: #53bf4b !important;
+}
+
+.github:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.clear-all-button:active,
+.clear-button:active,
+.equals-button:active,
+.github:active {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
 .footer p {
   font-size: 36px;
-  bottom: 0px;
 }

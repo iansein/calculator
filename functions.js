@@ -6,19 +6,27 @@ const equalsButton = document.querySelector(".equals-button");
 const operatorsRegExpression = /(\+|\-|\*|÷)/;
 const lastKeyPressed = [];
 const operators = ["+", "-", "*", "÷"];
+const finalResult = [];
 let equalsPressed = false;
+let syntaxError = false;
 display.textContent = 0;
 
 clearAll.addEventListener("click", (e) => {
   e.stopPropagation();
   equalsPressed = false;
   display.textContent = "0";
+  syntaxError = false;
 });
 
 clearButton.addEventListener("click", () => {
-  let newDisplay;
-  newDisplay = display.textContent.slice(0, -1);
-  display.textContent = newDisplay;
+  if (
+    !syntaxError &&
+    finalResult[finalResult.length - 1] != display.textContent
+  ) {
+    let newDisplay;
+    newDisplay = display.textContent.slice(0, -1);
+    display.textContent = newDisplay;
+  }
 });
 
 buttons.forEach((button) => {
@@ -38,51 +46,52 @@ equalsButton.addEventListener("click", () => {
 //& -If you touch equals button, the next input can't be a number, only operator.
 
 function displayEquation(button) {
-  let operatorPressed = false;
-  lastKeyPressed.push(button.textContent);
-  console.log(lastKeyPressed);
-  for (let i = 0; i < operators.length; i++) {
-    if (
-      lastKeyPressed[lastKeyPressed.length - 2] === operators[i] &&
-      (button.textContent === "+" ||
-        button.textContent === "-" ||
-        button.textContent === "*" ||
-        button.textContent === "÷") &&
-      !equalsPressed
-    ) {
-      display.textContent += "";
-      lastKeyPressed.pop();
-      operatorPressed = true;
-    } else if (
-      equalsPressed &&
-      (button.textContent === "+" ||
-        button.textContent === "-" ||
-        button.textContent === "*" ||
-        button.textContent === "÷")
-    ) {
-      display.textContent += button.textContent;
-      equalsPressed = false;
-      operatorPressed = true;
+  if (!syntaxError) {
+    let operatorPressed = false;
+    lastKeyPressed.push(button.textContent);
+    console.log(lastKeyPressed);
+    for (let i = 0; i < operators.length; i++) {
+      if (
+        lastKeyPressed[lastKeyPressed.length - 2] === operators[i] &&
+        (button.textContent === "+" ||
+          button.textContent === "-" ||
+          button.textContent === "*" ||
+          button.textContent === "÷") &&
+        !equalsPressed
+      ) {
+        display.textContent += "";
+        lastKeyPressed.pop();
+        operatorPressed = true;
+      } else if (
+        equalsPressed &&
+        (button.textContent === "+" ||
+          button.textContent === "-" ||
+          button.textContent === "*" ||
+          button.textContent === "÷")
+      ) {
+        display.textContent += button.textContent;
+        equalsPressed = false;
+        operatorPressed = true;
+      }
     }
-  }
-  if (!operatorPressed && !equalsPressed) {
-    if (
-      display.textContent === "0" &&
-      button.textContent != "0" &&
-      button.textContent != "+" &&
-      button.textContent != "-" &&
-      button.textContent != "*" &&
-      button.textContent != "÷"
-    ) {
-      display.textContent = button.textContent;
-    } else if (display.textContent === "0" && button.textContent === "0") {
-      display.textContent = "0";
-    } else {
-      display.textContent += button.textContent;
+    if (!operatorPressed && !equalsPressed) {
+      if (
+        display.textContent === "0" &&
+        button.textContent != "0" &&
+        button.textContent != "+" &&
+        button.textContent != "-" &&
+        button.textContent != "*" &&
+        button.textContent != "÷"
+      ) {
+        display.textContent = button.textContent;
+      } else if (display.textContent === "0" && button.textContent === "0") {
+        display.textContent = "0";
+      } else {
+        display.textContent += button.textContent;
+      }
     }
+    operatorPressed = false;
   }
-
-  operatorPressed = false;
 }
 
 //& Calculate the equation
@@ -92,6 +101,11 @@ function calculate(equation) {
   let sums = 0;
   let subtractions = 0;
   let divideByZero = false;
+  if (equation[equation.length - 1] === "") {
+    display.textContent = "Syntax Error";
+    syntaxError = true;
+    return false;
+  }
 
   //^ It does the multiplications and divisions first
   for (let i = 0; i < equation.length; i++) {
@@ -102,7 +116,8 @@ function calculate(equation) {
     } else if (equation[i] === "÷") {
       if (equation[i + 1] === "0") {
         divideByZero = true;
-        display.textContent = "Syntax Error";
+        display.textContent = "Can't divide by 0";
+        syntaxError = true;
         return false;
       }
       divisions = Number(equation[i - 1]) / Number(equation[i + 1]);
@@ -125,15 +140,17 @@ function calculate(equation) {
   }
 
   // ^ Check if the division returns 0
-  if (!divideByZero) {
-    if (hasDecimals(equation[0])) {
-      display.textContent = equation[0].toFixed(4);
-    } else if (!isNaN(equation[0])) {
-      display.textContent = equation[0];
-    } else {
-      display.textContent = "Syntax Error";
-    }
+
+  if (isNaN(equation[0])) {
+    display.textContent = "Syntax Error";
+    syntaxError = true;
+  } else if (hasDecimals(equation[0])) {
+    display.textContent = equation[0].toFixed(4);
+  } else if (!isNaN(equation[0])) {
+    display.textContent = equation[0];
   }
+
+  finalResult.push(equation[0]);
 }
 
 //& Check if the final result has decimals
